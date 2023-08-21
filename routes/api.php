@@ -17,9 +17,11 @@ use Illuminate\Support\Facades\Mail;
 // Route::post('/register', 'Api\Auth\RegisterController@register')->name('register');
 Route::post('/register', [App\Http\Controllers\Api\Auth\RegisterController::class, 'register']);
 
-Route::get('/verify-email/{id}', [App\Http\Controllers\Api\Auth\RegisterController::class, 'verify']);
+// Route::get('/verify-email/{id}', [App\Http\Controllers\Api\Auth\RegisterController::class, 'verify']);
+// Route::get('/verify-email/{id}', [App\Http\Controllers\Api\Auth\RegisterController::class, 'verify']);
 
-// Route::get('/verify-email/{id}', 'Api\Auth\RegisterController@verify')->name('verification.verify');
+// Route::get('/api/verify-email/{id}', 'Api\Auth\RegisterController@verify')->name('verification.verify');
+Route::get('/api/verify-email/{id}', [App\Http\Controllers\Api\Auth\RegisterController::class, 'verify'])->name('verification.verify');
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
