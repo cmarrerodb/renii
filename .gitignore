@@ -18,3 +18,4 @@ yarn-error.log
 /.idea
 /.vscode
 rutas.txt
+resources/views/auth/password-reset.blade.php.bak

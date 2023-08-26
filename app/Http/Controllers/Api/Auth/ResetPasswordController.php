@@ -4,32 +4,23 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Password;
+use Carbon\Carbon;
 
 class ResetPasswordController extends Controller
 {
-    // public function resetPassword(ResetPasswordRequest $request) {
-    //     $user = User::where('email', $request->email)->first();
-    //     if (!$user) {
-    //         return $this->errorResponse('El email no existe', 404);
-    //     }
-    //     $status = Password::sendResetLink($request->only('email'));
-    //     if ($status === Password::RESET_LINK_SENT) {
-    //         return $this->successResponse('Se ha enviado un email para restablecer la contraseña', 200);
-    //     } else {
-    //         return $this->errorResponse('Error al enviar el email', 500);
-    //     }
-    // }
-
     public function resetPassword(Request $request) {
         if (isset($request->token)) {
-            return view('auth.password-reset', ['token' => $request->token,'email' => $request->email]);
-            // return response()->json([
-            //     'token' => $request->token,
-            //     'email' => $request->email,
-            // ], 200);
+            $tokenBD = DB::table('password_reset_tokens')->select('token','created_at')->where('email', $request->email)->first();
+            $fechaActual = Carbon::now();
+            $fechaExpiracion = Carbon::parse($tokenBD->created_at);
+            $vigente = $fechaExpiracion->diffInHours($fechaActual) <= 24 ? 1 : 0;
+            $valido = Hash::check($request->token, $tokenBD->token) ? 1 :0;
+            return view('auth.password-reset', ['token' => $request->token,'email' => $request->email,'valido' => $valido,'vigente' => $vigente]);
         } else {
             $user = User::where('email', $request->input('email'))->first();
             if (!$user) {
@@ -42,7 +33,6 @@ class ResetPasswordController extends Controller
                 return $this->errorResponse('Error al enviar el email', 500);
             }
         }
-    // public function resetPassword(ResetPasswordRequest $request) {
         $user = User::where('email', $request->input('email'))->first();
         if (!$user) {
             return $this->errorResponse('El email no existe', 404);
@@ -55,20 +45,6 @@ class ResetPasswordController extends Controller
         }
     }
 
-/*     public function resetPassword($email) {
-        // dd($request->all());
-    // public function resetPassword(ResetPasswordRequest $request) {
-        $user = User::where('email', $email)->first();
-        if (!$user) {
-            return $this->errorResponse('El email no existe', 404);
-        }
-        $status = Password::sendResetLink($email);
-        if ($status === Password::RESET_LINK_SENT) {
-            return $this->successResponse('Se ha enviado un email para restablecer la contraseña', 200);
-        } else {
-            return $this->errorResponse('Error al enviar el email', 500);
-        }
-    } */
     public function successResponse($message, $status) {
         return response()->json([
             'message' => $message,
@@ -81,13 +57,21 @@ class ResetPasswordController extends Controller
             'status' => $status,
         ], $status);
     }
-    // public function resetPasswordForm(Request $request, $token)
-    // {
-    //     return view('auth.password-reset', ['token' => $token]);
-    // }
 
     public function password_update(Request $request) {
-        dd("pepe");
+        $fields = $request->validate([
+         'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+            ],
+        ], [
+            'password.required' => 'El campo contraseña es obligatorio.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.regex' => 'La contraseña debe contener una letra mayúscula, una letra minúscula, un número y un carácter especial.',
+        ]);        
     }
 
 }
