@@ -21,7 +21,14 @@ Route::post('/register', [App\Http\Controllers\Api\Auth\RegisterController::clas
 // Route::get('/verify-email/{id}', [App\Http\Controllers\Api\Auth\RegisterController::class, 'verify']);
 
 // Route::get('/api/verify-email/{id}', 'Api\Auth\RegisterController@verify')->name('verification.verify');
-Route::get('/api/verify-email/{id}', [App\Http\Controllers\Api\Auth\RegisterController::class, 'verify'])->name('verification.verify');
+
+// Route::match(['get','post'],'/password/reset', [App\Http\Controllers\Api\Auth\ResetPasswordController::class,'resetPassword'])->name('password.reset');
+
+// Route::post('/password/reset', [App\Http\Controllers\Api\Auth\ResetPasswordController::class,'resetPassword'])->name('password.reset');
+
+// Route::get('reset-password/{token}', 'Auth\ResetPasswordController@resetPasswordForm')->name('reset.password.form');
+Route::match(['get', 'post'], '/password/reset', [App\Http\Controllers\Api\Auth\ResetPasswordController::class,'resetPassword'])->name('password.reset');
+Route::post('/password_update', [App\Http\Controllers\Api\Auth\RegisterController::class, 'password_update'])->name('password.update');
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
