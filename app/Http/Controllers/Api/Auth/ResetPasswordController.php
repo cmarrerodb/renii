@@ -1,16 +1,15 @@
 <?php
 
 namespace App\Http\Controllers\Api\Auth;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\ResetPasswordRequest;
+use Illuminate\Support\Facades\Session;
 use App\Models\User;
 use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
-
 class ResetPasswordController extends Controller
 {
     public function resetPassword(Request $request) {
@@ -57,21 +56,27 @@ class ResetPasswordController extends Controller
             'status' => $status,
         ], $status);
     }
-
     public function password_update(Request $request) {
+        $password= '"';
         $fields = $request->validate([
          'password' => [
                 'required',
                 'confirmed',
                 'min:8',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.\-_,()=#|[\]{])[A-Za-z\d@$!%*?&.\-_,()=#|[\]{]+$/',
             ],
         ], [
             'password.required' => 'El campo contraseña es obligatorio.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
             'password.regex' => 'La contraseña debe contener una letra mayúscula, una letra minúscula, un número y un carácter especial.',
-        ]);        
+        ]);
+        User::where('email', $request->email)->update(['password' => bcrypt($fields['password'])]);
+        $response = [
+            'message' => 'La clave ha sido actualizada exitosamente'
+        ];
+        Session::flash('success_message', 'La clave ha sido actualizada exitosamente');
+        return view('auth.password-message');
     }
 
 }
