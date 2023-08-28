@@ -17,3 +17,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+rutas.txt
+resources/views/auth/password-reset.blade.php.bak
