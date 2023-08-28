@@ -21,7 +21,7 @@ class RegisterController extends Controller
                 'required',
                 'confirmed',
                 'min:8',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.\-_,()=#|[\]{])[A-Za-z\d@$!%*?&.\-_,()=#|[\]{]+$/',
             ],
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
