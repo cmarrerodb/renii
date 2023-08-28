@@ -15,7 +15,6 @@
                             <form method="POST" action="{{ route('password.update') }}">
                                 @csrf
                                 <input type="hidden" name="token" value="{{ $token }}">
-                                {{-- <input type="hidden" name="email" value="{{ $email }}"> --}}
                                 <div class="form-group row">
                                     <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Correo') }}</label>
                                     <div class="col-md-6">
@@ -25,14 +24,14 @@
                                 <div class="form-group row">
                                     <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Clave') }}<span style="color:red;font-weight:bold;">*</span></label>
                                     <div class="col-md-6" style="margin-top:3%;">
-                                        <input id="password" type="password" class="form-control" name="password" required autocomplete="off" style="background-color:#f2f0df;">
+                                        <input id="password" type="password" class="form-control" name="password" required autocomplete="off" style="background-color:#f2f0df;" value="">
                                         <div id="pass_error" style="color:red;font-size:70%;margin-bottom:5%;"></div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="password_confirmation" class="col-md-4 col-form-label text-md-right">{{ __('Confirmar Clave') }}<span style="color:red;font-weight:bold;">*</label>
                                     <div class="col-md-6" style="margin-top:1%;">
-                                        <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required autocomplete="off" style="background-color:#f2f0df">
+                                        <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required autocomplete="off" style="background-color:#f2f0df;">
                                         <div id="conf_error" style="color:red;font-size:80%;"></div>
                                     </div>
                                 </div>
@@ -66,6 +65,8 @@
     |<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Asegúrate de incluir la biblioteca jQuery -->
     <script>
         $(document).ready(function() {
+            $("#password").val('');
+            $("#password_confirmation").val('');
             function validarPassword() {
                 var password = $("#password").val();
                 regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.\-_,()=#|[\]{}])[A-Za-z\d@$!%*?&.\-_,()=#|[\]{}]{8,}$/;
