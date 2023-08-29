@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\Api\Auth;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -9,11 +7,13 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 
 class RegisterController extends Controller
 {
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email',
@@ -33,19 +33,22 @@ class RegisterController extends Controller
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
             'password.regex' => 'La contraseña debe contener una letra mayúscula, una letra minúscula, un número y un carácter especial.',
         ]);
+
         $user = User::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => Hash::make($fields['password']),
             'email_verified_at' => null,
         ]);
+
         event(new Registered($user));
+
         return response()->json([
             'message' => 'El registro del usuario ha sido exitoso'
         ], 201);
     }
-
-    public function verify(Request $request) {
+    public function verify(Request $request)
+    {
         $user = User::find($request->route('id'));
         if ($user->hasVerifiedEmail()) {
             return response()->json([
@@ -60,32 +63,26 @@ class RegisterController extends Controller
             'message' => 'El correo electrónico ha sido verificado exitosamente'
         ], 200);
     }
+    public function resendVerify(Request $request) {
+        $user = User::where('email', $request->email)->first();
 
-public function resetPassword(Request $request) {
-    $request->validate([
-        'email' => 'required|email',
-        'token' => 'required|string',
-        'password' => 'required|string|confirmed|min:8',
-    ]);
+        if (!$user) {
+            return response()->json([
+                'message' => 'No se encontró un usuario con ese correo electrónico'
+            ], 404);
+        }
 
-    $response = Password::reset($request->only('email', 'password', 'password_confirmation', 'token'), function ($user, $password) {
-        $user->forceFill([
-            'password' => bcrypt($password)
-        ])->save();
-    });
+        if ($user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'El correo electrónico ya ha sido verificado previamente'
+            ], 400);
+        }
 
-    if ($response !== Password::PASSWORD_RESET) {
-        return response()->json(['message' => trans($response)], 400);
+        $user->sendEmailVerificationNotification();
+
+        return response()->json([
+            'message' => 'El correo de verificación ha sido reenviado exitosamente'
+        ], 200);
     }
 
-    return response()->json(['message' => 'Password reset successful'], 200);
-}
-
-    // public function sendResetLinkEmail(Request $request) {
-    //     $request->validate(['email' => 'required|email']);
-    //     $response = Password::sendResetLink($request->only('email'));
-    //     return $response == Password::RESET_LINK_SENT
-    //                 ? response()->json(['message' => 'Se ha enviado un enlace de restablecimiento de contraseña a su correo electrónico'], 200)
-    //                 : response()->json(['message' => 'No se pudo enviar el enlace de restablecimiento de contraseña'], 400);
-    // }    
 }

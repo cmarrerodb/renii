@@ -5,7 +5,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use App\Models\User;
-use App\Models\Accesos;
 use App\Models\Ingresos;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,7 +20,7 @@ class AuthController extends Controller
         ]);
         $user = User::where('email',$fields['email'])->first();
         if (!$user || !Hash::check($fields['password'],$user->password)) {
-            $this->accesos($request,$user->id,2,null);
+            $this->ingresos($request,$user->id,2,null);
             return response([
                 'message' => 'Credenciales erróneas'
             ],401);
@@ -31,7 +30,12 @@ class AuthController extends Controller
             return response([
                 'message' => 'Debe verificar su correo electrónico antes de iniciar sesión'
             ], 401);
-        }        
+        }
+        if ($user->status !=1) {
+            return response([
+                'message' => 'Usuario suspendido o dado de baja'
+            ], 401);
+        }
         $token = $user->createToken('myapptoken')->plainTextToken;
         $response = [
             'user' => $user,
@@ -50,15 +54,10 @@ class AuthController extends Controller
             $ingreso->status_salida = 1;
             $ingreso->save();
         }
-        // if ($acceso) {
-            //     $acceso->fecha_salida = now();
-            //     $acceso->status_salida = 1;
-            //     $acceso->save();
-            // }
-            foreach ($user->tokens as $token) {
-                $token->delete();
-            }
-            unset($user);
+        foreach ($user->tokens as $token) {
+            $token->delete();
+        }
+        unset($user);
         return [
             'message' => 'Salió del sistema'
         ];
@@ -73,13 +72,6 @@ class AuthController extends Controller
             $ingreso->status_ingreso = $status; // ingreso exitoso
             $ingreso->save();
         }
-
         return;
     }    
-    public function mail_check($codigo) {
-        $user = User::where('codigo', $codigo)->first();
-        $fecha_vencimiento = Carbon::parse($user->created_at);
-        $fecha_actual = Carbon::now();
-
-    }
 }
