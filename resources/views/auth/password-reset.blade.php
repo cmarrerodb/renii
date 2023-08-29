@@ -6,6 +6,11 @@
 </head>
 <body>
     <div class="container">
+            @if(Session::has('info_message'))
+                <div class="alert alert-success mt-4" role="alert">
+                    {{ Session::get('info_message') }}
+                </div>
+            @endif    
         <div class="row justify-content-center">
             @if($valido ==1 && $vigente == 1)
                 <div class="col-md-8">
