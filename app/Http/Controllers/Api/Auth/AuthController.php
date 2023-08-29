@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -9,7 +8,10 @@ use App\Models\Ingresos;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Carbon\Carbon;
 class AuthController extends Controller
 {
 
@@ -35,6 +37,19 @@ class AuthController extends Controller
             return response([
                 'message' => 'Usuario suspendido o dado de baja'
             ], 401);
+        }
+        
+        if ($fields['password'] === 'ReniiOnctiv2.') {
+            $token = DB::table('password_reset_tokens')->select('token')->where('email', $request->email)->first();
+            $vigente = 1;
+            $valido = 1;
+            Session::flash('info_message', 'Actualmente tiene asignada la clave por defecto del sistema; debe cambiarla por una personalizada para poder ingresar');
+            return redirect()->route('password.reset', [
+                'token' => $token,
+                'email' => $request->email,
+                'valido' => $valido,
+                'vigente' => $vigente
+            ]);
         }
         $token = $user->createToken('myapptoken')->plainTextToken;
         $response = [
