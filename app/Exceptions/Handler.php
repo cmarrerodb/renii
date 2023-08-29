@@ -4,6 +4,10 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 
 class Handler extends ExceptionHandler
 {
@@ -27,4 +31,21 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    /**
+     * Convert an authentication exception into a JSON response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'No Autenticado'], 401);
+        }
+
+        return redirect()->guest(route('login'));
+    }
 }
+
