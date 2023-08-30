@@ -12,6 +12,16 @@ use App\Models\User;
 
 class RegisterController extends Controller
 {
+    public function prueba1() {
+        return response()->json([
+            'message' => 'Prueba 1'
+        ], 201);
+    }
+    public function prueba2() {
+        return response()->json([
+            'message' => 'Prueba 2'
+        ], 201);
+    }
     public function register(Request $request)
     {
         $fields = $request->validate([
