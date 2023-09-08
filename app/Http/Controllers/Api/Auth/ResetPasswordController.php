@@ -12,16 +12,13 @@ use Carbon\Carbon;
 class ResetPasswordController extends Controller
 {
     public function resetPassword(Request $request) {
-        // dd($request->token);
-        $token = $request->token['token'];
-        if (isset($request->token[1])) {
+        if (isset($request->token)) {
             $tokenBD = DB::table('password_reset_tokens')->select('token','created_at')->where('email', $request->email)->first();
             $fechaActual = Carbon::now();
             $fechaExpiracion = Carbon::parse($tokenBD->created_at);
             $vigente = $fechaExpiracion->diffInHours($fechaActual) <= 24 ? 1 : 0;
             $valido = Hash::check($request->token, $tokenBD->token) ? 1 :0;
-            return view('auth.password-reset', ['token' => $token,'email' => $request->email,'valido' => $valido,'vigente' => $vigente]);
-            // return view('auth.password-reset', ['token' => $request->token,'email' => $request->email,'valido' => $valido,'vigente' => $vigente]);
+            return view('auth.password-reset', ['token' => $request->token,'email' => $request->email,'valido' => $valido,'vigente' => $vigente]);
         } else {
             $user = User::where('email', $request->input('email'))->first();
             if (!$user) {

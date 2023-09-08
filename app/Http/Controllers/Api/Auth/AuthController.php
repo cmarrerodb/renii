@@ -16,7 +16,6 @@ class AuthController extends Controller
 {
 
     public function login(Request $request) {
-        // return dd($request->all());
         $fields = $request->validate([
             'email' =>'required|string|email',
             'password' =>'required|string'
@@ -39,12 +38,12 @@ class AuthController extends Controller
                 'message' => 'Usuario suspendido o dado de baja'
             ], 401);
         }
+        
         if ($fields['password'] === 'ReniiOnctiv2.') {
             $token = DB::table('password_reset_tokens')->select('token')->where('email', $request->email)->first();
             $vigente = 1;
             $valido = 1;
             Session::flash('info_message', 'Actualmente tiene asignada la clave por defecto del sistema; debe cambiarla por una personalizada para poder ingresar');
-            // dd('PEPE');
             return redirect()->route('password.reset', [
                 'token' => $token,
                 'email' => $request->email,

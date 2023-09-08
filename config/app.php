@@ -55,7 +55,8 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+//    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://cmarrerodb.com/apis_reniiv2'),
 
     'asset_url' => env('ASSET_URL'),
 

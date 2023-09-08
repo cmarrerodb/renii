@@ -20,3 +20,5 @@ yarn-error.log
 rutas.txt
 resources/views/auth/password-reset.blade.php.bak
 app/Providers/RouteServiceProvider.php.bak
+public/.htaccess_bak
+public/.htaccess_orig

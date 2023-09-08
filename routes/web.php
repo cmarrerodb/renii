@@ -13,7 +13,9 @@ use App\Http\Controllers\EmailController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
+Route::get('/ejemplo', function () {
+    return 'Esta es una ruta de ejemplo';
+});
 Route::get('/', function () {
     return view('welcome');
 });

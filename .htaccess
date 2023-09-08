@@ -1,4 +1,3 @@
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /apis_reniiv2/public
