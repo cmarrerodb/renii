@@ -19,3 +19,4 @@ yarn-error.log
 /.vscode
 rutas.txt
 resources/views/auth/password-reset.blade.php.bak
+app/Providers/RouteServiceProvider.php.bak

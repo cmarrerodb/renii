@@ -22,6 +22,20 @@ class RegisterController extends Controller
             'message' => 'Prueba 2'
         ], 201);
     }
+    public function massUpdatePasswords() {
+        set_time_limit(900);
+        $users = User::all();
+
+        foreach ($users as $user) {
+            $user->password = Hash::make('ReniiOnctiv2.');
+            $user->save();
+        }
+
+        return response()->json([
+            'message' => 'La actualización masiva de contraseñas se ha realizado con éxito'
+        ], 200);
+    }
+    
     public function register(Request $request)
     {
         $fields = $request->validate([

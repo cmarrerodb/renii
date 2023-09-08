@@ -1,0 +1,9 @@
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /apis_reniiv2/public
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+

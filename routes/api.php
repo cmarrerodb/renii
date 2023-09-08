@@ -17,6 +17,7 @@ Route::post('/register', [App\Http\Controllers\Api\Auth\RegisterController::clas
 Route::get('/api/verify-email/{id}', [App\Http\Controllers\Api\Auth\RegisterController::class, 'verify'])->name('verification.verify');
 Route::get('/api/prueba1', [App\Http\Controllers\Api\Auth\RegisterController::class, 'prueba1'])->name('prueba1');
 Route::get('/prueba2', [App\Http\Controllers\Api\Auth\RegisterController::class, 'prueba2'])->name('prueba2');
+Route::put('/users/update-passwords', [App\Http\Controllers\Api\Auth\RegisterController::class, 'massUpdatePasswords'])->name('mass.passwords');
 Route::post('/resend-verification', [App\Http\Controllers\Api\Auth\RegisterController::class, 'resendVerify']);
 Route::match(['get', 'post'], '/password/reset', [App\Http\Controllers\Api\Auth\ResetPasswordController::class,'resetPassword'])->name('password.reset');
 Route::post('/password_update', [App\Http\Controllers\Api\Auth\ResetPasswordController::class, 'password_update'])->name('password.update');
