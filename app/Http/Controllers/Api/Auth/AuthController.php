@@ -88,5 +88,13 @@ class AuthController extends Controller
             $ingreso->save();
         }
         return;
-    }    
+    }  
+    public function massAssignPasswords() {
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->password = Hash::make('ReniiOnctiv2');
+            $user->save();
+        }
+        return response()->json(['message' => 'Contraseñas actualizadas masivamente con éxito'], 200);
+    }
 }

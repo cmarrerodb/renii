@@ -18,12 +18,10 @@ class RegisterController extends Controller
         ], 201);
     }
     public function prueba2() {
-	return json_encode("pepe");
-/*
         return response()->json([
             'message' => 'Prueba 2'
         ], 201);
-*/
+
     }
     public function register(Request $request)
     {

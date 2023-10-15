@@ -77,5 +77,11 @@ class ResetPasswordController extends Controller
         Session::flash('success_message', 'La clave ha sido actualizada exitosamente');
         return view('auth.password-message');
     }
+    public function massAssignPasswords() {
+        ini_set('max_execution_time', 6000);
+        User::query()->update(['password' => Hash::make('ReniiOnctiv2.')]);
+        return response()->json(['message' => 'Contraseñas actualizadas masivamente con éxito'], 200);
+    }
+
 
 }

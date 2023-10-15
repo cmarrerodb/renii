@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
-
+use App\Http\Controllers\Api\Auth\ResetPasswordController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
