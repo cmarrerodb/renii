@@ -43,10 +43,11 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('/cedula/{cedula}',[IdentificacionController::class,'show']);
     Route::resource('sexo','Api\Investigadores\SexoController');
     Route::resource('estado_civil','Api\Investigadores\EstadoCivilController');
+    Route::resource('organizaciones_sociales','Api\Investigadores\OrganizacionesSocialesController');
     Route::resource('pueblos_indigenas','Api\Investigadores\PueblosIndigenasController');
     Route::resource('tiempo_dedicacion','Api\Investigadores\TiempoDedicacionController');
     Route::resource('tipo_dedicacion','Api\Investigadores\TipoDedicacionController');
-    Route::resource('organizaciones_sociales','Api\Investigadores\OrganizacionesSocialesController');
+    Route::get('buscar_pueblo/{pueblo}',[PueblosIndigenasController::class,'search_pueblo'])->name('pueblos_indigenas.buscar');
     // Route::get('/prueba1', [RegisterController::class, 'prueba1'])->name('prueba1');
 //     Route::post('/pueblos_indigenas',[PueblosIndigenasController::class,'store']);
 //     Route::put('/pueblos_indigenas/{id}',[PueblosIndigenasController::class,'update']);

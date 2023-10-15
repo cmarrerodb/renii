@@ -47,4 +47,8 @@ class PueblosIndigenasController extends Controller
     {
         //
     }
+    public function search_pueblo(string $pueblo) {
+        $pueblo_indigena = DB::table('pueblo_indigena')->where('pueblo_indigena','=',$pueblo)->get();
+        return response()->json($pueblo_indigena);
+    }    
 }
