@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Investigadores\SexoController;
 use App\Http\Controllers\Api\Investigadores\EstadoCivilController;
 use App\Http\Controllers\Api\Investigadores\PueblosIndigenasController;
 use App\Http\Controllers\Api\Investigadores\TiempoDedicacionController;
+use App\Http\Controllers\Api\Geolocalizacion\EstadoController;
 use App\Http\Controllers\InvestigadoresController;
 
 
@@ -37,10 +38,6 @@ Route::post('/login',[AuthController::class,'login']);
 Route::put('/mass-update', [ResetPasswordController::class, 'massAssignPasswords']);
 
 Route::middleware(['auth:sanctum','verified'])->group(function () {
-    Route::resource('investigadores', 'InvestigadoresController');
-    Route::get('/investigadores/email/{email}',[InvestigadoresController::class,'search_email'])->name('investigadores.email');
-    Route::get('/investigadores/cedula/{ci}',[InvestigadoresController::class,'search_cedula'])->name('investigadores.cedula');
-    Route::get('/cedula/{cedula}',[IdentificacionController::class,'show']);
     Route::resource('sexo','Api\Investigadores\SexoController');
     Route::resource('estado_civil','Api\Investigadores\EstadoCivilController');
     Route::resource('organizaciones_sociales','Api\Investigadores\OrganizacionesSocialesController');
@@ -48,9 +45,13 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::resource('tiempo_dedicacion','Api\Investigadores\TiempoDedicacionController');
     Route::resource('tipo_dedicacion','Api\Investigadores\TipoDedicacionController');
     Route::get('buscar_pueblo/{pueblo}',[PueblosIndigenasController::class,'search_pueblo'])->name('pueblos_indigenas.buscar');
-    // Route::get('/prueba1', [RegisterController::class, 'prueba1'])->name('prueba1');
-//     Route::post('/pueblos_indigenas',[PueblosIndigenasController::class,'store']);
-//     Route::put('/pueblos_indigenas/{id}',[PueblosIndigenasController::class,'update']);
-//     Route::delete('/pueblos_indigenas/{id}',[PueblosIndigenasController::class,'destroy']);
+    Route::resource('investigadores', 'InvestigadoresController');
+    Route::get('/investigadores/email/{email}',[InvestigadoresController::class,'search_email'])->name('investigadores.email');
+    Route::get('/investigadores/cedula/{ci}',[InvestigadoresController::class,'search_cedula'])->name('investigadores.cedula');
+    Route::get('/cedula/{cedula}',[IdentificacionController::class,'show']);
+    //****************  Geolocalización
+    Route::resource('estados','Api\Geolocalizacion\EstadoController');
+    Route::get('buscar_estado/{estado_id}','Api\Geolocalizacion\EstadoController@search_estado')->name('estado.buscar');
+    //****************  Geolocalización
     Route::post('/logout',[AuthController::class,'logout']);
 });

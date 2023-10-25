@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Api\Geolocalización;
+namespace App\Http\Controllers\Api\Geolocalizacion;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
+use App\Models\Estados;
 class EstadoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
+    public function index() {
+        // $estados = DB::table('estados')->orderBy('id')->get();
+        $estados = Estados::orderBy('id')->get();
+        return response()->json($estados);
     }
 
     /**
@@ -46,4 +48,10 @@ class EstadoController extends Controller
     {
         //
     }
+    public function search_estado(string $estado_id) {
+        
+        $estado = Estados::where('id','=',$estado_id)->get();
+        // $estado = DB::table('estados')->where('id','=',$estado_id)->get();
+        return response()->json($estado);
+    }    
 }
