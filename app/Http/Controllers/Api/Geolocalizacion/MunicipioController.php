@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Geolocalización;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Municipios;
+use Illuminate\Http\Response;
 
 class MunicipioController extends Controller
 {
@@ -46,4 +48,16 @@ class MunicipioController extends Controller
     {
         //
     }
+    public function municipios_estados(Request $request, $estado_id) {
+        $municipios = Municipios::with('estado')
+            ->where('estado_id', $estado_id)
+            ->orderBy('municipio', 'asc')
+            ->get(['id', 'cod_municipio', 'municipio']);
+
+        if ($municipios->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron registros'], 404);
+        }
+
+        return response()->json($municipios, 200);
+    }      
 }

@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Estados;
+use App\Models\Municipios;
+use App\Models\Parroquias;
+use Illuminate\Http\Response;
 class EstadoController extends Controller
 {
     /**
@@ -48,10 +51,28 @@ class EstadoController extends Controller
     {
         //
     }
-    public function search_estado(string $estado_id) {
-        
+    public function search_estado(string $estado_id) {       
         $estado = Estados::where('id','=',$estado_id)->get();
-        // $estado = DB::table('estados')->where('id','=',$estado_id)->get();
         return response()->json($estado);
-    }    
+    }
+    public function estado_municipios(Request $request, $estado_id) {
+        $municipios = Municipios::where('estado_id', $estado_id)
+            ->orderBy('municipio', 'asc')
+            ->get(['id', 'cod_municipio', 'municipio']);
+
+        if ($municipios->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron registros'], 404);
+        }
+        return response()->json($municipios, 200);
+    }          
+    public function municipio_parroquias(Request $request, $municipio_id) {
+        $parroquias = Parroquias::where('municipio_id', $municipio_id)
+            ->orderBy('parroquia', 'asc')
+            ->get(['id', 'cod_parroquia', 'parroquia']);
+
+        if ($parroquias->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron registros'], 404);
+        }
+        return response()->json($parroquias, 200);
+    }          
 }

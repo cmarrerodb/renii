@@ -46,11 +46,16 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::resource('tipo_dedicacion','Api\Investigadores\TipoDedicacionController');
     Route::get('buscar_pueblo/{pueblo}',[PueblosIndigenasController::class,'search_pueblo'])->name('pueblos_indigenas.buscar');
     Route::resource('investigadores', 'InvestigadoresController');
+    Route::post('/vista_investigadores',[InvestigadoresController::class,'investigators_view'])->name('investigadores.vista');
     Route::get('/investigadores/email/{email}',[InvestigadoresController::class,'search_email'])->name('investigadores.email');
     Route::get('/investigadores/cedula/{ci}',[InvestigadoresController::class,'search_cedula'])->name('investigadores.cedula');
+    Route::post('/investigador',[InvestigadoresController::class,'logged_investigator'])->name('investigador');
+    Route::post('/vista_investigador',[InvestigadoresController::class,'logged_investigator_view'])->name('investigador.vista');
     Route::get('/cedula/{cedula}',[IdentificacionController::class,'show']);
     //****************  Geolocalización
     Route::resource('estados','Api\Geolocalizacion\EstadoController');
+    Route::get('estado_municipios/{estado_id}','Api\Geolocalizacion\EstadoController@estado_municipios')->name('estado.municipio');
+    Route::get('municipio_parroquias/{municipio_id}','Api\Geolocalizacion\EstadoController@municipio_parroquias')->name('municipio.parroquias');
     Route::get('buscar_estado/{estado_id}','Api\Geolocalizacion\EstadoController@search_estado')->name('estado.buscar');
     //****************  Geolocalización
     Route::post('/logout',[AuthController::class,'logout']);
