@@ -51,6 +51,10 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('/investigadores/cedula/{ci}',[InvestigadoresController::class,'search_cedula'])->name('investigadores.cedula');
     Route::post('/investigador',[InvestigadoresController::class,'logged_investigator'])->name('investigador');
     Route::post('/vista_investigador',[InvestigadoresController::class,'logged_investigator_view'])->name('investigador.vista');
+    
+    Route::get('/listados_moduloi',[InvestigadoresController::class,'listados_investigadores'])->name('investigador.listados');
+    Route::get('/cne/{cedula}',[InvestigadoresController::class,'cne'])->name('investigador.cne');
+
     Route::get('/cedula/{cedula}',[IdentificacionController::class,'show']);
     //****************  Geolocalización
     Route::resource('estados','Api\Geolocalizacion\EstadoController');

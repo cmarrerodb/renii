@@ -12,7 +12,11 @@ use App\Models\Estados;
 use App\Models\Municipios;
 use App\Models\Parroquias;
 use App\Models\CodigosPostales;
-
+use App\Models\PueblosIndigenas;
+use App\Models\TiempoDedicacion;
+use App\Models\TipoDedicacion;
+use App\Models\OrganizacionesSociales;
+use Goutte\Client;
 class InvestigadoresController extends Controller
 {
     /**
@@ -230,5 +234,149 @@ class InvestigadoresController extends Controller
         });
         return response()->json($investigadores, 200);
     }
+    public function listados_investigadores()
+    {
+        $estadoCivil = EstadoCivil::all();
+        $nacionalidad = Nacionalidad::all();
+        $sexo = Sexo::all();
+        $estados = Estados::all();
+        $municipios = Municipios::all();
+        $parroquias = Parroquias::all();
+        $codigosPostales = CodigosPostales::all();
+        $pueblosIndigenas = PueblosIndigenas::all();
+        $tiempoDedicacion = TiempoDedicacion::all();
+        $tipoDedicacion = TipoDedicacion::all();
+        $organizacionesSociales = OrganizacionesSociales::all();
 
+        return response()->json([
+            'estadoCivil' => $estadoCivil,
+            'nacionalidad' => $nacionalidad,
+            'sexo' => $sexo,
+            'estados' => $estados,
+            'municipios' => $municipios,
+            'parroquias' => $parroquias,
+            'codigosPostales' => $codigosPostales,
+            'pueblosIndigenas' => $pueblosIndigenas,
+            'tiempoDedicacion' => $tiempoDedicacion,
+            'tipoDedicacion' => $tipoDedicacion,
+            'organizacionesSociales' => $organizacionesSociales,
+        ]);
+    }
+    public function cne($ci) {
+        $url = "http://www.cne.gob.ve/web/registro_electoral/ce.php?nacionalidad=V&cedula=$ci";
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        $response1 = curl_exec($curl);
+        curl_close($curl);
+        $response = str_replace('sta[\'descripcion\'] = $s_res[\'descripcion\'];', '', $response1);
+        preg_match('/<td align="left"><b><font color="#00387b">Cédula:<\/font><\/b><\/td>\s+<td align="left">(.*?)<\/td>/', $response, $matches);
+        $cedula = $matches[1] ?? '';
+
+        preg_match('/<td align="left"><b><font color="#00387b">Nombre:<\/font><\/b><\/td>\s+<td align="left"><b>(.*?)<\/b><\/td>/', $response, $matches);
+        $nombre = $matches[1] ?? '';
+
+        preg_match('/<td align="left"><b><font color="#00387b">Estado:<\/font><\/b><\/td>\s+<td align="left">(.*?)<\/td>/', $response, $matches);
+        $estado = $matches[1] ?? '';
+        
+        preg_match('/<td align="left"><b><font color="#00387b">Municipio:<\/font><\/b><\/td>\s*<td align="left">(.*?)<\/td>/', $response, $matches);        
+        $municipio = $matches[1] ?? '';
+
+        preg_match('/<td align="left"><b><font color="#00387b">Parroquia:<\/font><\/b><\/td>\s+<td align="left">(.*?)<\/td>/', $response, $matches);
+        $parroquia = $matches[1] ?? '';
+
+        preg_match('/<td align="left"><b><font color="#00387b">Centro:<\/font><\/b><\/td>\s+<td align="left"><font color="#0000FF">(.*?)<\/font><\/td>/', $response, $matches);
+        $centro = $matches[1] ?? '';
+
+        preg_match('/<td align="left"><b><font color="#00387b">Dirección:<\/font><\/b><\/td>\s+<td align="left"><font color="#0000FF">(.*?)<\/font><\/td>/', $response, $matches);
+        $direccion = $matches[1] ?? '';
+        $nombreParts = explode(' ', $nombre);
+
+        $response = [
+            'nacionalidad' => 'V',
+            'cedula' => $ci,
+            'primer_nombre' => $nombreParts[0],
+            'segundo_nombre' => $nombreParts[1],
+            'primer_apellido' => $nombreParts[2],
+            'segundo_apellido' => $nombreParts[3],
+            'estado' => $estado,
+            'municipio' => $municipio,
+            'parroquia' => $parroquia,
+            'centro' => $centro,
+            'direccion' => $direccion,
+        ];
+
+        return response()->json($response);
+    }
+// public function cne($ci)
+// {
+//     $client = new Client();
+//     $url = "http://www.cne.gob.ve/web/registro_electoral/ce.php?nacionalidad=V&cedula=$ci";
+//     $crawler = $client->request('GET', $url);
+    
+//     $data = $crawler->filter('td')->each(function ($node) {
+//         return $node->text();
+//     });
+    
+//     // Ahora $data es un array que contiene todos los td del HTML
+//     // Puedes buscar la información que necesitas por su índice
+//     $response = [
+//         'nacionalidad' => 'V',
+//         'cedula' => $ci,
+//         'primer_nombre' => $data[1],
+//         'segundo_nombre' => $data[3],
+//         'primer_apellido' => $data[5],
+//         'segundo_apellido' => $data[7],
+//         'estado' => $data[9],
+//         'municipio' => $data[11],
+//         'parroquia' => $data[13],
+//         'centro' => $data[15],
+//         'direccion' => $data[17],
+//     ];
+
+//     return response()->json($response);
+// }
+// public function cne($ci)
+// {
+//     $client = new Client();
+//     $url = "http://www.cne.gob.ve/web/registro_electoral/ce.php?nacionalidad=V&cedula=$ci";
+//     $crawler = $client->request('GET', $url);
+
+//     $data = $crawler->filter('td')->each(function ($node) {
+//         return $node->text();
+//     });
+
+//     $nacionalidad = substr($data[1], 0, 1); // Obtenemos la primera letra
+//     $cedula = intval(substr($data[1], 2)); // Obtenemos el número después del guión
+
+//     $nombre = explode(" ", $data[3]); // Separamos el nombre en partes
+
+//     $primer_nombre = $nombre[0];
+//     $segundo_nombre = $nombre[1];
+//     $primer_apellido = $nombre[2];
+//     $segundo_apellido = $nombre[3];
+
+//     $estado = $data[5];
+//     $municipio = $data[7];
+//     $parroquia = $data[9];
+//     $centro = $data[11];
+//     $direccion = $data[13];
+
+//     $response = [
+//         'nacionalidad' => $nacionalidad,
+//         'cedula' => $cedula,
+//         'primer_nombre' => $primer_nombre,
+//         'segundo_nombre' => $segundo_nombre,
+//         'primer_apellido' => $primer_apellido,
+//         'segundo_apellido' => $segundo_apellido,
+//         'estado' => $estado,
+//         'municipio' => $municipio,
+//         'parroquia' => $parroquia,
+//         'centro' => $centro,
+//         'direccion' => $direccion,
+//     ];
+
+//     return response()->json($response);
+// }
 }
