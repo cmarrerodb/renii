@@ -22,7 +22,9 @@ class AuthController extends Controller
         ]);
         $user = User::where('email',$fields['email'])->first();
         if (!$user || !Hash::check($fields['password'],$user->password)) {
-            $this->ingresos($request,$user->id,2,null);
+            if (isset($user->id))
+                $this->ingresos($request,$user->id,2,null);
+            
             return response([
                 'message' => 'Credenciales erróneas'
             ],401);
