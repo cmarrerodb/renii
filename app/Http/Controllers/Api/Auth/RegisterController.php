@@ -21,6 +21,7 @@ class RegisterController extends Controller
         return response()->json([
             'message' => 'Prueba 2'
         ], 201);
+
     }
     public function register(Request $request)
     {

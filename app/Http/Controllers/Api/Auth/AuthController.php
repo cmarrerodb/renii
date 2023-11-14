@@ -22,7 +22,9 @@ class AuthController extends Controller
         ]);
         $user = User::where('email',$fields['email'])->first();
         if (!$user || !Hash::check($fields['password'],$user->password)) {
-            $this->ingresos($request,$user->id,2,null);
+            if (isset($user->id))
+                $this->ingresos($request,$user->id,2,null);
+            
             return response([
                 'message' => 'Credenciales erróneas'
             ],401);
@@ -88,5 +90,13 @@ class AuthController extends Controller
             $ingreso->save();
         }
         return;
-    }    
+    }  
+    public function massAssignPasswords() {
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->password = Hash::make('ReniiOnctiv2');
+            $user->save();
+        }
+        return response()->json(['message' => 'Contraseñas actualizadas masivamente con éxito'], 200);
+    }
 }

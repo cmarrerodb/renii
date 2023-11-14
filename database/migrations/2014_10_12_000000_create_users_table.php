@@ -20,6 +20,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->smallInteger('status')->default(1);
             $table->timestamps();
+            $table->timestamp('deleted_at');
         });
     }
 

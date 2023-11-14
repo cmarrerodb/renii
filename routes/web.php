@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
-
+use App\Http\Controllers\Api\Auth\ResetPasswordController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,7 +13,9 @@ use App\Http\Controllers\EmailController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
+Route::get('/ejemplo', function () {
+    return 'Esta es una ruta de ejemplo';
+});
 Route::get('/', function () {
     return view('welcome');
 });

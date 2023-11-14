@@ -44,8 +44,6 @@ class Handler extends ExceptionHandler
         if ($request->expectsJson()) {
             return response()->json(['message' => 'No Autenticado'], 401);
         }
-
-        return redirect()->guest(route('login'));
     }
 }
 
