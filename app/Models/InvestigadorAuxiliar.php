@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class InvestigadorAuxiliar
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class InvestigadorAuxiliar extends Model
 {
+    use SoftDeletes;
 	protected $table = 'investigador_auxiliar';
 	public $timestamps = false;
 
@@ -49,6 +51,8 @@ class InvestigadorAuxiliar extends Model
 		'organizacion_social_id',
 		'area_local_id'
 	];
+
+    protected $dates = ['deleted_at'];
 
 	public function investigadore()
 	{

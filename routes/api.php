@@ -45,14 +45,19 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::resource('tiempo_dedicacion','Api\Investigadores\TiempoDedicacionController');
     Route::resource('tipo_dedicacion','Api\Investigadores\TipoDedicacionController');
     Route::get('buscar_pueblo/{pueblo}',[PueblosIndigenasController::class,'search_pueblo'])->name('pueblos_indigenas.buscar');
+    
     Route::resource('investigadores', 'InvestigadoresController');
+    Route::get('/investigadores/suspender/{id}',[InvestigadoresController::class,'suspend_investigator'])->name('investigadores.suspender');
+    Route::get('/investigadores/reactivar/{id}',[InvestigadoresController::class,'reactivate_investigator'])->name('investigadores.reactivar');
+    Route::get('/investigadores/recuperar/{id}',[InvestigadoresController::class,'recover_investigator'])->name('investigadores.recuperar');
+
     Route::post('/vista_investigadores',[InvestigadoresController::class,'investigators_view'])->name('investigadores.vista');
     Route::get('/investigadores/email/{email}',[InvestigadoresController::class,'search_email'])->name('investigadores.email');
     Route::get('/investigadores/cedula/{ci}',[InvestigadoresController::class,'search_cedula'])->name('investigadores.cedula');
     Route::post('/investigador',[InvestigadoresController::class,'logged_investigator'])->name('investigador');
     Route::post('/vista_investigador',[InvestigadoresController::class,'logged_investigator_view'])->name('investigador.vista');
-    
     Route::get('/listados_moduloi',[InvestigadoresController::class,'listados_investigadores'])->name('investigador.listados');
+
     Route::get('/cne/{cedula}',[IdentificacionController::class,'cne'])->name('investigador.cne');
     // Route::get('/cne/{cedula}',[InvestigadoresController::class,'cne'])->name('investigador.cne');
 

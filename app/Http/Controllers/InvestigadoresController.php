@@ -19,6 +19,7 @@ use App\Models\PueblosIndigenas;
 use App\Models\TiempoDedicacion;
 use App\Models\TipoDedicacion;
 use App\Models\OrganizacionesSociales;
+use App\Models\User;
 use Goutte\Client;
 class InvestigadoresController extends Controller
 {
@@ -156,7 +157,6 @@ class InvestigadoresController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
-    
             return response()->json([
                 'message' => 'Error al insertar los datos',
                 'error' => $e->getMessage(),
@@ -324,13 +324,112 @@ class InvestigadoresController extends Controller
             ], 500);
         }        
     }
-
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function suspend_investigator($id) {
+        DB::beginTransaction();
+        try {
+            $user = User::findOrFail($id);
+            $user->status = 0;
+            $user->save();
+            $token = DB::table('personal_access_tokens')->where('tokenable_id','=',$id)->whereNull('last_used_at')->first();
+            if ($token) {
+                $token->last_used_at = date("Y-m-d H:i:s", time());
+                $token->save();    
+            }
+            $investigador = Investigadores::where('usuario_id', $id)->first();
+            if ($investigador) {
+                $investigador->status = 0;
+                $investigador->save();
+                $investigadorAuxiliar = InvestigadorAuxiliar::where('investigador_id', $investigador->id)->first();
+                if ($investigadorAuxiliar) {
+                    $investigadorAuxiliar->status = 0;
+                    $investigadorAuxiliar->save();   
+                }
+            }
+            DB::commit();
+            return response()->json(['message' => 'Usuario suspendido correctamente'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al suspender usuario'], 500);
+        }        
+    }
+    public function reactivate_investigator($id) {
+        DB::beginTransaction();
+        try {
+            $user = User::findOrFail($id);
+            $user->status = 1;
+            $user->save();
+            $investigador = Investigadores::where('usuario_id', $id)->first();
+            if ($investigador) {
+                $investigador->status = 1;
+                $investigador->save();
+                $investigadorAuxiliar = InvestigadorAuxiliar::where('investigador_id', $investigador->id)->first();
+                if ($investigadorAuxiliar) {
+                    $investigadorAuxiliar->status = 1;
+                    $investigadorAuxiliar->save();   
+                }
+            }
+            DB::commit();
+            return response()->json(['message' => 'Usuario reactivado correctamente'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al reactivar usuario'], 500);
+        }        
+    }
+    public function destroy(string $id) {
+        DB::beginTransaction();
+
+        try {
+            $user = User::findOrFail($id);
+            $user->status = 0;
+            $user->save();
+            $investigador = Investigadores::where('usuario_id', $id)->first();
+            if ($investigador) {
+                $investigador->status = 0;
+                $investigador->save();
+                $investigadorAuxiliar = InvestigadorAuxiliar::where('investigador_id', $investigador->id)->first();
+                if ($investigadorAuxiliar) {
+                    $investigadorAuxiliar->status = 0;
+                    $investigadorAuxiliar->save();   
+                    $investigadorAuxiliar->delete();
+                }
+            }
+            $investigador->delete();
+            $user->delete();
+            DB::commit();
+            return response()->json(['message' => 'Registro eliminado correctamente'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al eliminar el registro'], 500);
+        }
+    }
+    public function recover_investigator(string $id) {
+        DB::beginTransaction();
+        try {
+            $user = User::withTrashed()->findOrFail($id);
+            $user->status = 1;
+            $user->save();
+            $user->restore();
+            $investigador = Investigadores::withTrashed()->where('usuario_id', $id)->first();
+            if ($investigador) {
+                $investigador->status = 1;
+                $investigador->save();
+                $investigador->restore();
+                $investigadorAuxiliar = InvestigadorAuxiliar::withTrashed()->where('investigador_id', $investigador->id)->first();
+                if ($investigadorAuxiliar) {
+                    $investigadorAuxiliar->status = 1;
+                    $investigadorAuxiliar->save();   
+                    $investigadorAuxiliar->restore();
+                }
+            }
+            DB::commit();
+            return response()->json(['message' => 'Usuario recuperado correctamente'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al recuperar el registro'], 500);
+        }
     }
     public function search_cedula(string $ci) {
         $investigador = DB::table('vperfil_inicial')->where('cedula','=',$ci)->get();
@@ -382,7 +481,8 @@ class InvestigadoresController extends Controller
                     ->on('investigador_auxiliar.investigador_id', '=', 'investigadores.id');
             })
             ->select(
-                'investigadores.id',
+                'investigadores.id as id_investigador',
+                'investigadores.usuario_id as id_usuario',
                 'nacionalidad.nacionalidad',
                 'investigadores.cedula',
                 'investigadores.pasaporte',
