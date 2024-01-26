@@ -36,6 +36,7 @@ Route::match(['get', 'post'], '/password_reset', [ResetPasswordController::class
 Route::post('/password_update', [ResetPasswordController::class, 'password_update'])->name('password.update');
 Route::post('/login',[AuthController::class,'login']);
 Route::put('/mass-update', [ResetPasswordController::class, 'massAssignPasswords']);
+Route::get('/datos_base',[InvestigadoresController::class,'datos_base'])->name('investigador.datos_base');
 
 Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::resource('sexo','Api\Investigadores\SexoController');
