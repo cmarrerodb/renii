@@ -13,6 +13,9 @@ use App\Http\Controllers\Api\Investigadores\PueblosIndigenasController;
 use App\Http\Controllers\Api\Investigadores\TiempoDedicacionController;
 use App\Http\Controllers\Api\Geolocalizacion\EstadoController;
 use App\Http\Controllers\InvestigadoresController;
+use App\Http\Controllers\Api\Investigadores\AmbitoController;
+use App\Http\Controllers\Api\Investigadores\NivelEstudioController;
+
 
 
 /*
@@ -36,6 +39,7 @@ Route::match(['get', 'post'], '/password_reset', [ResetPasswordController::class
 Route::post('/password_update', [ResetPasswordController::class, 'password_update'])->name('password.update');
 Route::post('/login',[AuthController::class,'login']);
 Route::put('/mass-update', [ResetPasswordController::class, 'massAssignPasswords']);
+Route::get('/datos_base',[InvestigadoresController::class,'datos_base'])->name('investigador.datos_base');
 
 Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::resource('sexo','Api\Investigadores\SexoController');
@@ -67,6 +71,28 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('estado_municipios/{estado_id}','Api\Geolocalizacion\EstadoController@estado_municipios')->name('estado.municipio');
     Route::get('municipio_parroquias/{municipio_id}','Api\Geolocalizacion\EstadoController@municipio_parroquias')->name('municipio.parroquias');
     Route::get('buscar_estado/{estado_id}','Api\Geolocalizacion\EstadoController@search_estado')->name('estado.buscar');
-    //****************  Geolocalización
+    
     Route::post('/logout',[AuthController::class,'logout']);
+    //****************  Academico
+    Route::resource('ambito','Api\Academico\AmbitoController');
+    Route::resource('nivel_estudio','Api\Academico\NivelEstudioController');
+    Route::resource('ambito','Api\Academico\AmbitoController');
+    Route::resource('lineas','Api\Academico\LineasConsejoPresidencialController');
+    Route::resource('areas','Api\Academico\AreasController');
+    Route::resource('capacitacion','Api\Academico\CapacitacionController');
+    Route::resource('paises','Api\Academico\PaisesController');
+    Route::resource('profesiones','Api\Academico\ProfesionesController');
+    Route::resource('estudios_superiores','Api\Academico\EstudiosSuperioresController');
+    Route::resource('motores','Api\Academico\MotoresdAgendaBolivarianaController');
+    Route::resource('instituciones','Api\Academico\InstitucionesController');
+    Route::resource('subareas','Api\Academico\SubareasController');
+    Route::resource('nivel_estudio_titulo','Api\Academico\NivelEstudioTituloController');
+    Route::resource('curso_capacitacion','Api\Academico\CursoCapacitacionController');
+    Route::resource('perfil_academico','Api\Academico\PerfilAcademicoController');
+
+
+    
+    
+    
+
 });

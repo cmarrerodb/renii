@@ -167,9 +167,27 @@ class InvestigadoresController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
+    public function datos_base() {
+        $total = Investigadores::count('cedula');
+        $poblacion = Estados::sum('poblacion');
+        $promedio = Investigadores::
+            select(DB::raw('FLOOR(AVG(EXTRACT(YEAR FROM AGE(fecha_nacimiento)))) AS promedio'))
+            ->value('promedio');
+        $fem = Investigadores::where('sexo_id', 2)
+            ->count('cedula');
+        $mas = Investigadores::where('sexo_id', 1)
+            ->count('cedula');
+        $densidad = DB::table('investigadores')
+            ->select(DB::raw('(((SELECT COUNT(cedula) FROM investigadores)::float / (SELECT sum(poblacion) FROM estados)::float) ::float* 100000.00)::integer'))
+            ->value('integer');
+        return response()->json([
+            'total' => $total,
+            'fem' => $fem,
+            'mas' => $mas,
+            'promedio' => $promedio,
+            'densidad' => $densidad,
+            'poblacion' => $poblacion,
+        ]);       
     }
 
     /**
