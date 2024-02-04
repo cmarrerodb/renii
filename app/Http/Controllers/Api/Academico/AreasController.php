@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Academico;
 use App\Http\Controllers\Controller;
 use App\Models\Areas;
 use Illuminate\Http\Request;
@@ -10,9 +10,13 @@ class AreasController extends Controller
         $areas = Areas::all();
         return response()->json($areas);
     }
-    public function show(Areas $area)
+    public function show($id)
     {
-        return response()->json($area);
+        $areas = Areas::find($id);
+        if (!$areas) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);
+        }
+        return response()->json($areas);        
     }
     public function store(Request $request)
     {
@@ -29,7 +33,7 @@ class AreasController extends Controller
             'data' => $area,
         ], 201);
     }
-    public function update(Request $request, Areas $area) 
+    public function update(Request $request, $id) 
     {
         $request->validate([
             'area' => 'required|string|max:150',
@@ -38,17 +42,23 @@ class AreasController extends Controller
             'area.string' => 'El campo área debe ser una cadena de caracteres.',
             'area.max' => 'El campo área no debe exceder los 150 caracteres.',
         ]);
+        $area = Areas::find($id);
+        if (!$area) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);   
+        }        
         $area->update($request->all());
         return response()->json([
             'message' => 'Registro actualizado exitosamente',
             'data' => $area,
         ], 201);
     }
-    public function destroy(Areas $area)
+    public function destroy($id)
     {
+        $area = Areas::find($id);
+        if (!$area) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);   
+        }        
         $area->delete();
-        return response()->json([
-            'message' => 'Registro eliminado exitosamente'
-        ], 204);
+        return response()->json(['message' => 'Registro eliminado correctamente'], 201);
     }
 }

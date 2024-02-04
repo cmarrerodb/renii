@@ -3,7 +3,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class LineaConsejoPresidencial extends Model
+class LineasConsejoPresidencial extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'lineas_consejo_presidencial';

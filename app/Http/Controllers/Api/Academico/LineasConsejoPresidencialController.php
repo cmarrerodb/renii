@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Academico;
 use App\Http\Controllers\Controller;
 use App\Models\LineasConsejoPresidencial;
 use Illuminate\Http\Request;
@@ -10,9 +10,17 @@ class LineasConsejoPresidencialController extends Controller
         $lineasConsejoPresidencial = LineasConsejoPresidencial::all();
         return response()->json($lineasConsejoPresidencial);
     }
-    public function show(LineasConsejoPresidencial $lineaConsejoPresidencial)
+    public function show(Request $request,$id)
     {
-        return response()->json($lineaConsejoPresidencial);
+        $lineasConsejoPresidencial = LineasConsejoPresidencial::find($id);
+        if (!$lineasConsejoPresidencial) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);   
+        }
+
+        $lineasConsejoPresidencial->update($request->all());
+        return response()->json([
+            'data' => $lineasConsejoPresidencial,
+        ], 201);
     }
     public function store(Request $request)
     {
@@ -24,13 +32,14 @@ class LineasConsejoPresidencialController extends Controller
             'linea_consejo_presidencial.max' => 'El campo línea_consejo_presidencial no debe exceder los 150 caracteres.',
         ]);
 
-        $lineaConsejoPresidencial = LineasConsejoPresidencial::create($request->all());
+        $lineasConsejoPresidencial = LineasConsejoPresidencial::create($request->all());
         return response()->json([
             'message' => 'Registro creado exitosamente',
-            'data' => $lineaConsejoPresidencial,
+            'data' => $lineasConsejoPresidencial,
         ], 201);
     }
-    public function update(Request $request, LineasConsejoPresidencial $lineaConsejoPresidencial) 
+    // public function update(Request $request, LineasConsejoPresidencial $lineasConsejoPresidencial) 
+    public function update(Request $request, $id) 
     {
         $request->validate([
             'linea_consejo_presidencial' => 'required|string|max:150',
@@ -39,18 +48,21 @@ class LineasConsejoPresidencialController extends Controller
             'linea_consejo_presidencial.string' => 'El campo línea_consejo_presidencial debe ser una cadena de caracteres.',
             'linea_consejo_presidencial.max' => 'El campo línea_consejo_presidencial no debe exceder los 150 caracteres.',
         ]);
-        $lineaConsejoPresidencial->update($request->all());
+        $lineasConsejoPresidencial = LineasConsejoPresidencial::find($id);
+        if (!$lineasConsejoPresidencial) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);   
+        }
+        $lineasConsejoPresidencial->update($request->all());
         return response()->json([
             'message' => 'Registro actualizado exitosamente',
-            'data' => $lineaConsejoPresidencial,
+            'data' => $lineasConsejoPresidencial,
         ], 201);
     }
-    public function destroy(LineasConsejoPresidencial $lineaConsejoPresidencial)
+    // public function destroy(LineasConsejoPresidencial $lineasConsejoPresidencial)
+    public function destroy($id)
     {
-        $lineaConsejoPresidencial->delete();
-
-        return response()->json([
-            'message' => 'Registro eliminado exitosamente'
-        ], 204);
+        $lineasConsejoPresidencial = LineasConsejoPresidencial::findOrFail($id);
+        $lineasConsejoPresidencial->delete();
+        return response()->json(['message' => 'Registro eliminado correctamente'], 201);
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Academico;
 use App\Http\Controllers\Controller;
 use App\Models\CursoCapacitacion;
 use Illuminate\Http\Request;

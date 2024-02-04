@@ -74,11 +74,10 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     
     Route::post('/logout',[AuthController::class,'logout']);
     //****************  Academico
-    Route::resource('ambito','Api\Academico\AmbitoController');
-    Route::resource('nivel_estudio','Api\Academico\NivelEstudioController');
-    Route::resource('ambito','Api\Academico\AmbitoController');
-    Route::resource('lineas','Api\Academico\LineasConsejoPresidencialController');
-    Route::resource('areas','Api\Academico\AreasController');
+    Route::resource('ambito','Api\Academico\AmbitoController'); //+
+    Route::resource('nivel_estudio','Api\Academico\NivelEstudioController'); //+
+    Route::resource('lineas','Api\Academico\LineasConsejoPresidencialController'); //+
+    Route::resource('areas','Api\Academico\AreasController'); //+
     Route::resource('capacitacion','Api\Academico\CapacitacionController');
     Route::resource('paises','Api\Academico\PaisesController');
     Route::resource('profesiones','Api\Academico\ProfesionesController');

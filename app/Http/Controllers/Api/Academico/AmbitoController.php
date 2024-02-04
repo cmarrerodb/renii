@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Academico;
 use App\Http\Controllers\Controller;
 use App\Models\Ambito;
 use Illuminate\Http\Request;
@@ -10,9 +10,14 @@ class AmbitoController extends Controller
         $ambitos = Ambito::all();
         return response()->json($ambitos);
     }
-    public function show(Ambito $ambito)
+    public function show($id)
     {
-        return response()->json($ambito);
+        $ambito = Ambito::find($id);
+        if (!$ambito) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);
+    
+        }
+        return response()->json($ambito);        
     }
     public function store(Request $request)
     {
@@ -30,7 +35,7 @@ class AmbitoController extends Controller
             'data' => $ambito,
         ], 201);
     }
-    public function update(Request $request, Ambito $ambito) 
+    public function update(Request $request, $id) 
     {
         $request->validate([
             'ambito' => 'required|string|max:150',
@@ -39,17 +44,20 @@ class AmbitoController extends Controller
             'ambito.string' => 'El campo ámbito debe ser una cadena de caracteres.',
             'ambito.max' => 'El campo ámbito no debe exceder los 150 caracteres.',
         ]);
+        $ambito = Ambito::find($id);
+        if (!$ambito) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);   
+        }
         $ambito->update($request->all());
         return response()->json([
             'message' => 'Registro actualizado exitosamente',
             'data' => $ambito,
         ], 201);
     }
-    public function destroy(Ambito $ambito)
+    public function destroy($id)
     {
-        $ambito->delete();
-        return response()->json([
-            'message' => 'Registro eliminado exitosamente'
-        ], 204);
-    }
+        $nivelEstudio = Ambito::find($id);
+        $nivelEstudio->delete();
+        return response()->json(['message' => 'Registro eliminado correctamente'], 201);
+    }    
 }
