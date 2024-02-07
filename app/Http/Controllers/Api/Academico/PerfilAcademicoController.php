@@ -1,17 +1,25 @@
 <?php
 namespace App\Http\Controllers\API\Academico;
 use App\Http\Controllers\Controller;
+use App\Models\Investigadores;
 use App\Models\PerfilAcademico;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 class PerfilAcademicoController extends Controller
 {
     public function index()
     {
-        $perfilAcademico = PerfilAcademico::all();
+        $perfilAcademico = DB::table('vperfil_academico')->get();
         return response()->json($perfilAcademico);
     }
-    public function show(PerfilAcademico $perfilAcademico)
+
+    public function show($id)
     {
+        $perfilAcademico = DB::table('vperfil_academico')->find($id);
+        if (!$perfilAcademico) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);
+        }
         return response()->json($perfilAcademico);
     }
     public function store(Request $request)
@@ -61,13 +69,26 @@ class PerfilAcademicoController extends Controller
             'ultimo.required' => 'El campo ultimo es requerido.',
             'ultimo.boolean' => 'El campo ultimo debe ser un valor booleano.',
         ]);
-        $perfilAcademico = PerfilAcademico::create($request->all());
+        try {
+            $perfilAcademico = PerfilAcademico::create($request->all());
+            $perfilAcademico->id = $perfilAcademico->id;
+            return response()->json([
+                'message' => 'Registro creado exitosamente',
+                'data' => $perfilAcademico,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'message' => 'Error al insertar los datos',
+                'error' => $e->getMessage(),
+            ], 500);
+        }    
         return response()->json([
             'message' => 'Registro creado exitosamente',
             'data' => $perfilAcademico,
         ], 201);
     }
-    public function update(Request $request, PerfilAcademico $perfilAcademico) 
+    public function update(Request $request, $id) 
     {
         $request->validate([
             'investigador_id' => 'required|integer',
@@ -114,17 +135,54 @@ class PerfilAcademicoController extends Controller
             'ultimo.required' => 'El campo ultimo es requerido.',
             'ultimo.boolean' => 'El campo ultimo debe ser un valor booleano.',
         ]);
-        $perfilAcademico->update($request->all());
-        return response()->json([
-            'message' => 'Registro actualizado exitosamente',
-            'data' => $perfilAcademico,
-        ], 201);
+        $perfilAcademico = PerfilAcademico::find($id);
+        if (!$perfilAcademico) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);
+        }
+        try {
+            $perfilAcademico->update($request->all());
+            $perfilAcademico->id = $perfilAcademico->id;
+            return response()->json([
+                'message' => 'Registro actualizado exitosamente',
+                'data' => $perfilAcademico,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'message' => 'Error al actualizar los datos',
+                'error' => $e->getMessage(),
+            ], 500);
+        }    
     }
-    public function destroy(PerfilAcademico $perfilAcademico)
+    public function destroy($id)
     {
+        $perfilAcademico = PerfilAcademico::find($id);
+        if (!$perfilAcademico) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);
+        }
         $perfilAcademico->delete();   
         return response()->json([
             'message' => 'Registro eliminado exitosamente'
-        ], 204);
+        ], 201);
     }
+    public function logged_academic(Request $request) {
+        $investigador_id = Investigadores::where('usuario_id', '=', Auth::id())->pluck('id');
+        $resultados = DB::table('vperfil_academico')
+        ->where('investigador_id', $investigador_id)
+        ->get();
+        return response()->json(['message' => $resultados], 201);
+    }
+    public function search_academic_ci(Request $request) {
+        $investigador_id = Investigadores::where('cedula', '=', $request->cedula)->pluck('id');    
+        if ($investigador_id->isEmpty()) {
+            return response()->json(['message' => 'Investigador no registrado'], 404);
+        }
+        $resultados = DB::table('vperfil_academico')
+            ->where('investigador_id', $investigador_id)
+            ->get();   
+        if ($resultados->isEmpty()) {
+            return response()->json(['message' => 'Investigador no tiene cursos registrados'], 404);
+        }   
+        return response()->json(['message' => $resultados], 201);
+    }    
 }

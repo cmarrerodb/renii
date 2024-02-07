@@ -15,9 +15,8 @@ use App\Http\Controllers\Api\Geolocalizacion\EstadoController;
 use App\Http\Controllers\InvestigadoresController;
 use App\Http\Controllers\Api\Investigadores\AmbitoController;
 use App\Http\Controllers\Api\Investigadores\NivelEstudioController;
-
-
-
+use App\Http\Controllers\Api\Academico\CursoCapacitacionController;
+use App\Http\Controllers\Api\Academico\PerfilAcademicoController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -63,7 +62,6 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('/listados_moduloi',[InvestigadoresController::class,'listados_investigadores'])->name('investigador.listados');
 
     Route::get('/cne/{cedula}',[IdentificacionController::class,'cne'])->name('investigador.cne');
-    // Route::get('/cne/{cedula}',[InvestigadoresController::class,'cne'])->name('investigador.cne');
 
     Route::get('/cedula/{cedula}',[IdentificacionController::class,'show']);
     //****************  Geolocalización
@@ -88,10 +86,8 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::resource('nivel_estudio_titulo','Api\Academico\NivelEstudioTituloController');
     Route::resource('curso_capacitacion','Api\Academico\CursoCapacitacionController');
     Route::resource('perfil_academico','Api\Academico\PerfilAcademicoController');
-
-
-    
-    
-    
-
+    Route::post('/cursos_investigador',[CursoCapacitacionController::class,'logged_courses'])->name('cursos.cursos_investigador'); 
+    Route::post('/cursos_cedula',[CursoCapacitacionController::class,'search_courses_ci'])->name('cursos.cursos_cedula'); 
+    Route::post('/academico_investigador',[PerfilAcademicoController::class,'logged_academic'])->name('academico.academico_investigador'); 
+    Route::post('/academico_cedula',[PerfilAcademicoController::class,'search_academic_ci'])->name('academico.academico_cedula'); 
 });

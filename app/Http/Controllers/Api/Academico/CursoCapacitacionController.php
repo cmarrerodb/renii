@@ -1,19 +1,26 @@
 <?php
 namespace App\Http\Controllers\API\Academico;
 use App\Http\Controllers\Controller;
-use App\Models\CursoCapacitacion;
+use App\Models\Cursos;
+use App\Models\Investigadores;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 class CursoCapacitacionController extends Controller
 {
     public function index()
     {
-        $cursosCapacitacion = CursoCapacitacion::all();
-        return response()->json($cursosCapacitacion);
+        $cursos = DB::table('vcurso_capacitacion')->get();
+        return response()->json($cursos);
     }
-
-    public function show(CursoCapacitacion $cursoCapacitacion)
+    public function show($id)
     {
-        return response()->json($cursoCapacitacion);
+        $cursos = Cursos::find($id);
+        $cursos = DB::table('vcurso_capacitacion')->find($id);
+        if (!$cursos) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);
+        }
+        return response()->json($cursos);
     }
     public function store(Request $request)
     {
@@ -55,13 +62,22 @@ class CursoCapacitacionController extends Controller
             'horas_academicas.required' => 'El campo horas_academicas es requerido.',
             'horas_academicas.integer' => 'El campo horas_academicas debe ser un número entero.',
         ]);
-        $cursoCapacitacion = CursoCapacitacion::create($request->all());
-        return response()->json([
-            'message' => 'Registro creado exitosamente',
-            'data' => $cursoCapacitacion,
-        ], 201);
+        try {
+            $cursos = Cursos::create($request->all());
+            $cursos->id = $cursos->id;
+            return response()->json([
+                'message' => 'Registro creado exitosamente',
+                'data' => $cursos,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'message' => 'Error al insertar los datos',
+                'error' => $e->getMessage(),
+            ], 500);
+        }    
     }
-    public function update(Request $request, CursoCapacitacion $cursoCapacitacion)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'investigador_id' => 'required|integer',
@@ -101,17 +117,52 @@ class CursoCapacitacionController extends Controller
             'horas_academicas.required' => 'El campo horas_academicas es requerido.',
             'horas_academicas.integer' => 'El campo horas_academicas debe ser un número entero.',
         ]);
-        $cursoCapacitacion->update($request->all());
-        return response()->json([
-            'message' => 'Registro actualizado exitosamente',
-            'data' => $cursoCapacitacion,
-        ], 201);
+        $cursos = Cursos::find($id);
+        if (!$cursos) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);   
+        }
+        try {
+            $cursos->update($request->all());
+            $cursos->id = $cursos->id;
+            return response()->json([
+                'message' => 'Registro creado exitosamente',
+                'data' => $cursos,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'message' => 'Error al actualizar los datos',
+                'error' => $e->getMessage(),
+            ], 500);
+        }          
     }
-    public function destroy(CursoCapacitacion $cursoCapacitacion)
+    public function destroy($id)
     {
-        $cursoCapacitacion->delete();
-        return response()->json([
-            'message' => 'Registro eliminado exitosamente'
-        ], 204);
+        $cursos = Cursos::find($id);
+        if (!$cursos) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);   
+        }        
+        $cursos->delete();
+        return response()->json(['message' => 'Registro eliminado correctamente'], 201);
+    }
+    public function logged_courses(Request $request) {
+        $investigador_id = Investigadores::where('usuario_id', '=', Auth::id())->pluck('id');
+        $resultados = DB::table('vcurso_capacitacion')
+        ->where('investigador_id', $investigador_id)
+        ->get();
+        return response()->json(['message' => $resultados], 201);
+    }
+    public function search_courses_ci(Request $request) {
+        $investigador_id = Investigadores::where('cedula', '=', $request->cedula)->pluck('id');    
+        if ($investigador_id->isEmpty()) {
+            return response()->json(['message' => 'Investigador no registrado'], 404);
+        }
+        $resultados = DB::table('vcurso_capacitacion')
+            ->where('investigador_id', $investigador_id)
+            ->get();   
+        if ($resultados->isEmpty()) {
+            return response()->json(['message' => 'Investigador no tiene cursos registrados'], 404);
+        }   
+        return response()->json(['message' => $resultados], 201);
     }
 }
